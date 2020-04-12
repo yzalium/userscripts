@@ -122,7 +122,7 @@
 		for (var id in bannedData.ids) {
 			var item;
 			if ( (item = document.getElementById(id)) ) {
-                item.style.setProperty('display', bannedData.ids[ id ], 'important');
+				item.style.setProperty('display', bannedData.ids[ id ], 'important');
 				//item.style.display = bannedData.ids[ id ];
 			}
 		}
@@ -132,7 +132,7 @@
 				value = bannedData.classes[ className ];
 
 			for (var i = 0; i < items.length; ++i) {
-                items[i].style.setProperty('display', value, 'important');
+				items[i].style.setProperty('display', value, 'important');
 				//items[i].style.display = value;
 			}
 		}

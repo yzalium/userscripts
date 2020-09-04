@@ -2,9 +2,9 @@
 // @name         Enhance
 // @namespace    http://mehh.net/
 // @version      0.1
-// @description  ENHANCE!
-// @author       Me
-// @run-at 		 document-idle
+// @description  ENHANCE! This script will parse html pages and find images, or image-related links. On mouse hover, it will display the contained image behind the link, or enhance them if they're already on the page, but downscaled.	// @description  ENHANCE!
+// @author       https://github.com/yzalium
+// @run-at 	 document-idle
 // @match        *://*/*
 // @grant        none
 // ==/UserScript==
@@ -13,17 +13,17 @@
 	'use strict';
 
 	var bubble, loadingElem, helper,
-        xhr = null,
+        	xhr = null,
 		showing = false,
 		mouseIsOnLeftHalf = false,
 		mouseIsOnTopHalf = false,
 		scrollbarWidth = 0,
 		mouseX = 0,
 		mouseY = 0,
-        displayedWidth = 0,
-        displayedHeight = 0,
-        needsVideo = false,
-        corsProxy = 'https://cors-anywhere.herokuapp.com/';
+        	displayedWidth = 0,
+        	displayedHeight = 0,
+        	needsVideo = false,
+        	corsProxy = 'https://cors-anywhere.herokuapp.com/';
 	init();
 
 	function init()
@@ -47,7 +47,7 @@
 		helper.id = 'link_target_helper';
 		document.body.appendChild(helper);
 
-        bubble = bubbleFactory('img');
+        	bubble = bubbleFactory('img');
 
 		// gotta overwrite the send() function of AJAX requests to apply our special rules
 		var _send = XMLHttpRequest.prototype.send;
@@ -57,19 +57,19 @@
 			var callback = this.onreadystatechange;
 			if (!callback || /https:\/\/cors-anywhere\.herokuapp\.com\//i.test(this.responseUrl)) {
 				return _send.apply(this, arguments);
-            }
+            		}
 
 			this.onreadystatechange = function()
 			{
 				callback.apply(this, arguments);
 				if (this && this.readyState == 4) { // this becomes null upon request cancellation
 					analyzePage();
-                }
+				}
 			}
 			_send.apply(this, arguments);
 		}
 
-        analyzePage();
+        	analyzePage();
 	}
 
 	function analyzePage()
@@ -85,24 +85,24 @@
 			var link = links[i];
 			if (!link.href) {
 				continue;
-            }
+            		}
 
 			if (!/\.(?:jpg|jpeg|png|gif)(?:\/?\?.*)*$/i.test(link.href)) {
 				try {
 					var imgDomain = link.href.match(/\/\/([a-zA-Z0-9.]+)/i)[1];
 					if (imgDomain == window.location.hostname) {
 						continue;
-                    }
+                    			}
 
 					if (/imgur\.com$/i.test(imgDomain)) {
 						toImgur.push(link);
-                    }
+					}
 					else if (/twitter\.com$/i.test(imgDomain)) {
 						toTwitter.push(link);
-                    }
-                    else {
+					}
+					else {
 						toDetail.push(link);
-                    }
+					}
 				} catch (e) {}
 
 				continue;
@@ -113,9 +113,9 @@
 				for (var j = 0; j < link.children.length; ++j) {
 					if (link.children[j].src && link.children[j].src == link.href) {
 						continue linkList;
-                    }
-                }
-            }
+					}
+				}
+			}
 
 			toEnhance.push(link);
 		}
@@ -126,11 +126,11 @@
 			var img = imgs[i];
 			if (!img.src) {
 				continue;
-            }
+            		}
 
 			if (img.naturalWidth > img.width * 1.5) { // if the img is reduced by less than a ratio of 1.5, we skip it
 				toEnhance.push(img);
-            }
+            		}
 		}
 		imgs = null;
 
@@ -155,8 +155,7 @@
 			toImgur[i].addEventListener('mouseout', blur, false);
 		}
 
-		for (i in toTwitter)
-		{
+		for (i in toTwitter) {
 			toTwitter[i].removeEventListener('mouseover', twitterScrape, false);
 			toTwitter[i].removeEventListener('mouseout', blur, false);
 			toTwitter[i].addEventListener('mouseover', twitterScrape, false);
@@ -166,7 +165,7 @@
 
 	function loadStarted(mouseEvent)
 	{
-        var pageWidth = window.innerWidth - scrollbarWidth,
+        	var pageWidth = window.innerWidth - scrollbarWidth,
 			pageHeight = window.innerHeight;
 
 		showing = true;
@@ -178,37 +177,37 @@
 		mouseIsOnTopHalf = mouseY / pageHeight < .5;
 	}
 
-    // TODO this doesn't do anything - load errors are never caught
-    var bubbleLoadError = function(e)
-    {
-        bubble.removeEventListener('error', bubbleLoadError, false);
+	// TODO this doesn't do anything - load errors are never caught
+	var bubbleLoadError = function(e)
+	{
+		bubble.removeEventListener('error', bubbleLoadError, false);
 
-        if (!bubble.src || !/imgur\.com/.test(bubble.src)) {
-            return;
-        }
+		if (!bubble.src || !/imgur\.com/.test(bubble.src)) {
+		    return;
+		}
 
-        var url = bubble.src.split('.');
-        url.pop();
-        url.push('png');
-        bubble.src = url.join('.');
-    }
+		var url = bubble.src.split('.');
+		url.pop();
+		url.push('png');
+		bubble.src = url.join('.');
+	}
 
 	function bubbleLoaded()
 	{
 		if (!showing) {
 			return;
-        }
+        	}
 
-        if (xhr) {
+        	if (xhr) {
 			xhr = null;
 		}
 		else {
 			setTimeout(function() {
 				helper.style.display = 'none';
 			}, 500);
-		};
+		}
 
-        bubble.removeEventListener('error', bubbleLoadError, false);
+        	bubble.removeEventListener('error', bubbleLoadError, false);
 
 		var imgWidth = bubble.naturalWidth,
 			imgHeight = bubble.naturalHeight,
@@ -221,11 +220,11 @@
 
 		if (availableWidth > imgWidth) {
 			availableWidth = imgWidth;
-        }
+        	}
 
 		if (availableHeight > imgHeight) {
 			availableHeight = imgHeight;
-        }
+        	}
 
 		var promisedHeight = availableWidth / ratio,
 			halfPromisedHeight = promisedHeight / 2;
@@ -233,44 +232,44 @@
 		// figuring out positioning
 		if (mouseIsOnLeftHalf) {
 			bubble.style.left = (isVertical ? mouseX + 5 : 5) + 'px';
-        }
+        	}
 		else {
 			bubble.style.right = (isVertical ? pageWidth - mouseX - 5 : 5) + 'px';
-        }
+        	}
 
 		if (mouseIsOnTopHalf && isVertical) {
 			bubble.style.top = (halfPromisedHeight > mouseY ? 5 : mouseY - halfPromisedHeight) + 'px';
-        }
+        	}
 		else if (mouseIsOnTopHalf) {
 			bubble.style.top = (mouseY + 5) + 'px';
-        }
+        	}
 		else if (!isVertical) {
 			bubble.style.bottom = (pageHeight - mouseY + 5) + 'px';
-        }
+        	}
 		else {
 			bubble.style.bottom = (halfPromisedHeight > pageHeight - mouseY ? 5 : pageHeight - (mouseY + halfPromisedHeight)) + 'px';
-        }
+        	}
 
 		// figuring out bubble size
 		if (availableWidth > imgWidth && availableHeight > imgHeight) {// plenty of space to draw
 			bubble.width = imgWidth;
-        }
+        	}
 		else if (availableWidth > imgWidth && availableHeight < imgHeight) { // height is lacking
 			bubble.height = availableHeight;
-        }
+	        }
 		else if (availableWidth < imgWidth && availableHeight > imgHeight) { // width is lacking
 			bubble.width = availableWidth;
-        }
+        	}
 
 		else // both directions are lacking
 		{
 			if (isVertical) {
 				bubble.height = availableHeight;
-            }
+            		}
 			else {
-                var tmp = availableHeight * ratio;
+		                var tmp = availableHeight * ratio;
 				bubble.width = availableWidth > tmp ? tmp : availableWidth;
-            }
+            		}
 		}
 
 		loadingElem.style.cursor = '';
@@ -278,7 +277,7 @@
 		// currently displayed picture is bigger: abort
 		if (displayedWidth >= bubble.width || displayedHeight >= bubble.height) {
 			return blur();
-        }
+        	}
 
 		bubble.style.display = 'block';
 	}
@@ -287,34 +286,33 @@
 	{
 		if (showing) {
 			return;
-        }
+        	}
 
 		if (xhr) {
 			xhr = null;
-        }
+        	}
 
 		loadStarted(event);
 
-        // imgur.com/gallery/[id] and imgur.com/a/[id] urls cannot be parsed anymore :(
-        if (/imgur\.com\/(?:\w+)\/\w+/.test(event.currentTarget.href)) {
-            return blur();
-        }
-        // imgur.com/[id] can be transformed into i.imgur.com/[id].jpg
-        else if (/:\/\/imgur\.com\/(?:\w{4,})$/.test(event.currentTarget.href)) {
-            bubble.src = event.currentTarget.href.replace('imgur', 'i.imgur') + '.jpg';
-            return;
-        }
+		// imgur.com/gallery/[id] and imgur.com/a/[id] urls cannot be parsed anymore :(
+		if (/imgur\.com\/(?:\w+)\/\w+/.test(event.currentTarget.href)) {
+		    return blur();
+		}
+		// imgur.com/[id] can be transformed into i.imgur.com/[id].jpg
+		else if (/:\/\/imgur\.com\/(?:\w{4,})$/.test(event.currentTarget.href)) {
+		    bubble.src = event.currentTarget.href.replace('imgur', 'i.imgur') + '.jpg';
+		    return;
+		}
 
-        // call the full imgur page, and parse it to get the actual image url
+        	// call the full imgur page, and parse it to get the actual image url
 		xhrFactory('GET', event.currentTarget.href, function() {
-            bubble.addEventListener('error', bubbleLoadError, false);
-            console.log(xhr.responseText);
+			bubble.addEventListener('error', bubbleLoadError, false);
 			var match = (xhr.responseText.match(/post-image-container[^<>]*(?:id="([a-z0-9/._-]+)")/i)
 				|| xhr.responseText.match(/(?:id="([a-z0-9/._-]+)")[^<>]*post-image-container/i));
 
-            if (match) {
-                bubble.src = 'https://i.imgur.com/'+ match[1] +'.jpg';
-            }
+			if (match) {
+				bubble.src = 'https://i.imgur.com/'+ match[1] +'.jpg';
+			}
 		});
 	}
 
@@ -322,11 +320,11 @@
 	{
 		if (showing) {
 			return;
-        }
+        	}
 
 		if (xhr) {
 			xhr = null;
-        }
+        	}
 
 		loadStarted(event);
 
@@ -340,9 +338,9 @@
 	{
 		if (showing) {
 			return;
-        }
+        	}
 
-		var	isImage = 'undefined' != typeof event.currentTarget.naturalWidth;
+		var isImage = 'undefined' != typeof event.currentTarget.naturalWidth;
 
 		loadStarted(event);
 
@@ -351,24 +349,24 @@
 			displayedHeight = event.currentTarget.height;
 		}
 		else {
-            // fake a click event to display details helper
-            xhrFactory('HEAD', event.currentTarget.href, function() {
-                detail({
-                    clientX: event.clientX,
-                    clientY: event.clientY,
-                    currentTarget: {
-                        href: 'File size : '+ (xhr.getResponseHeader('Content-Length') / 1000) +'kb'
-                    }
-                });
-            });
-        }
+			// fake a click event to display details helper
+			xhrFactory('HEAD', event.currentTarget.href, function() {
+				detail({
+					clientX: event.clientX,
+					clientY: event.clientY,
+					currentTarget: {
+						href: 'File size : '+ (xhr.getResponseHeader('Content-Length') / 1000) +'kb'
+					}
+				});
+			});
+        	}
 
 		bubble.src = isImage ? event.currentTarget.src : event.currentTarget.href;
 
-        // TODO this doesn't work
-        if (/\.gif(?:\/?\?.*)*$/i.test(bubble.src)) {
-            setTimeout(bubbleLoaded, 2000);
-        }
+		// TODO this doesn't work
+		if (/\.gif(?:\/?\?.*)*$/i.test(bubble.src)) {
+		    setTimeout(bubbleLoaded, 2000);
+		}
 	}
 
 	function blur()
@@ -378,19 +376,19 @@
 		mouseIsOnTopHalf = false;
 		mouseX = 0;
 		mouseY = 0;
-        helper.style.display = 'none';
+        	helper.style.display = 'none';
 
 		if (loadingElem) {
-            displayedWidth = 0;
-            displayedHeight = 0;
-            bubble.src = '';
-            bubble.removeAttribute('width');
-            bubble.removeAttribute('height');
-            bubble.style.top = '';
-            bubble.style.bottom = '';
-            bubble.style.left = '';
-            bubble.style.right = '';
-            bubble.style.display = 'none';
+			displayedWidth = 0;
+			displayedHeight = 0;
+			bubble.src = '';
+			bubble.removeAttribute('width');
+			bubble.removeAttribute('height');
+			bubble.style.top = '';
+			bubble.style.bottom = '';
+			bubble.style.left = '';
+			bubble.style.right = '';
+			bubble.style.display = 'none';
 			loadingElem.style.cursor = '';
 			loadingElem = null;
 		}
@@ -398,12 +396,12 @@
 
 	function detail(event)
 	{
-        if (xhr) {
+	        if (xhr) {
 			xhr = null;
 		}
 
-        var top;
-        helper.style.display = 'block';
+		var top;
+		helper.style.display = 'block';
 		helper.style.top = top = (event.clientY + 15) + 'px';
 		helper.style.left = (event.clientX + 250 > window.innerWidth ? event.clientX - 260 : event.clientX) + 'px';
 		helper.innerHTML = event.currentTarget.href;
@@ -411,7 +409,7 @@
 		setTimeout(function() {
 			if (top == helper.style.top) {
 				helper.style.display = 'none';
-            }
+            		}
 		}, 5000);
 	}
 
@@ -435,33 +433,33 @@
 		outer.parentNode.removeChild(outer);
 	}
 
-    function bubbleFactory(type)
-    {
-        var ref = document.createElement(type);
-		ref.style.borderRadius = '5px';
-		ref.style.position = 'fixed';
-		ref.style.zIndex = '100000';
-		ref.style.display = 'none';
-		ref.style.pointerEvents = 'none';
+	function bubbleFactory(type)
+	{
+		var ref = document.createElement(type);
+			ref.style.borderRadius = '5px';
+			ref.style.position = 'fixed';
+			ref.style.zIndex = '100000';
+			ref.style.display = 'none';
+			ref.style.pointerEvents = 'none';
 
-        /*
-        if ('video' == type) {
-            ref.setAttribute('mute', true);
-            ref.setAttribute('autoplay', true);
-            ref.setAttribute('loop', true);
-            ref.setAttribute('playsinline', true);
-            ref.setAttribute('preload', 'auto');
-            ref.addEventListener('canplay', bubbleLoaded, false);
-        }
-        else {
-        */
-            ref.addEventListener('load', bubbleLoaded, false);
-        /*}*/
+		/*
+		if ('video' == type) {
+		    ref.setAttribute('mute', true);
+		    ref.setAttribute('autoplay', true);
+		    ref.setAttribute('loop', true);
+		    ref.setAttribute('playsinline', true);
+		    ref.setAttribute('preload', 'auto');
+		    ref.addEventListener('canplay', bubbleLoaded, false);
+		}
+		else {
+		*/
+		    ref.addEventListener('load', bubbleLoaded, false);
+		/*}*/
 
 		document.body.appendChild(ref);
 
-        return ref;
-    }
+		return ref;
+	}
 
 	function xhrFactory(method, url, successCallback)
 	{
@@ -470,7 +468,7 @@
 		xhr.onreadystatechange = function() {
 			if (xhr && xhr.readyState == 4 && xhr.status == 200) { // xhr can be null if cancelled
 				successCallback();
-            }
+            		}
 		};
 		xhr.send();
 	}

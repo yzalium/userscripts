@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Enhance
 // @namespace    http://mehh.net/
-// @version      0.1
+// @version      0.2
 // @description  ENHANCE! This script will parse html pages and find images, or image-related links. On mouse hover, it will display the contained image behind the link, or enhance them if they're already on the page, but downscaled.	// @description  ENHANCE!
 // @author       https://github.com/yzalium
 // @run-at 	 document-idle

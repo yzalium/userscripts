@@ -2,8 +2,8 @@
 // @name         Enhance
 // @namespace    http://mehh.net/
 // @version      0.1
-// @description  ENHANCE! This script will parse html pages and find images, or image-related links. On mouse hover, it will display the contained image behind the link, or enhance them if they're already on the page, but downscaled.
-// @author       https://github.com/yzalium
+// @description  ENHANCE!
+// @author       Me
 // @run-at 		 document-idle
 // @match        *://*/*
 // @grant        none
@@ -62,7 +62,7 @@
 			this.onreadystatechange = function()
 			{
 				callback.apply(this, arguments);
-				if (this.readyState == 4) {
+				if (this && this.readyState == 4) { // this becomes null upon request cancellation
 					analyzePage();
                 }
 			}
@@ -295,8 +295,13 @@
 
 		loadStarted(event);
 
-        // imgur.com/gallery/[id] urls cannot be parsed anymore :(
-        if (/gallery/.test(event.currentTarget.href)) {
+        // imgur.com/gallery/[id] and imgur.com/a/[id] urls cannot be parsed anymore :(
+        if (/imgur\.com\/(?:\w+)\/\w+/.test(event.currentTarget.href)) {
+            return blur();
+        }
+        // imgur.com/[id] can be transformed into i.imgur.com/[id].jpg
+        else if (/:\/\/imgur\.com\/(?:\w{4,})$/.test(event.currentTarget.href)) {
+            bubble.src = event.currentTarget.href.replace('imgur', 'i.imgur') + '.jpg';
             return;
         }
 
@@ -304,9 +309,12 @@
 		xhrFactory('GET', event.currentTarget.href, function() {
             bubble.addEventListener('error', bubbleLoadError, false);
             console.log(xhr.responseText);
-			var uri = (xhr.responseText.match(/post-image-container[^<>]*(?:id="([a-z0-9/._-]+)")/i)
-				|| xhr.responseText.match(/(?:id="([a-z0-9/._-]+)")[^<>]*post-image-container/i))[1];
-			bubble.src = 'https://i.imgur.com/'+uri+'.jpg';
+			var match = (xhr.responseText.match(/post-image-container[^<>]*(?:id="([a-z0-9/._-]+)")/i)
+				|| xhr.responseText.match(/(?:id="([a-z0-9/._-]+)")[^<>]*post-image-container/i));
+
+            if (match) {
+                bubble.src = 'https://i.imgur.com/'+ match[1] +'.jpg';
+            }
 		});
 	}
 
@@ -460,7 +468,7 @@
 		xhr = new XMLHttpRequest();
 		xhr.open(method, corsProxy + url, true);
 		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4 && xhr.status == 200) {
+			if (xhr && xhr.readyState == 4 && xhr.status == 200) { // xhr can be null if cancelled
 				successCallback();
             }
 		};

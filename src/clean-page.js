@@ -4,7 +4,7 @@
 // @version      3
 // @description  A page cleaner utility, enabling you to highlight-on-hover sections of visited html pages, and delete them on the fly. Deleted sections will be saved as unwanted, and hidden again at your next visit. Config is saved by domain.
 // @author       https://github.com/yzalium
-// @run-at 		 document-idle
+// @run-at 	 document-idle
 // @match        *://*/*
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -54,6 +54,7 @@
 		// manual extra rules registerer
 		// addSpecialAction('css::body', 'overflow', 'auto !important');
 		// addSpecialAction('css::.qc-cmp-ui-container', 'display', 'none !important');
+		// addSpecialAction('css::.qc-cmp2-ui', 'display', 'none !important');
 
 		helper = document.createElement('div');
 		helper.style.position = 'fixed';
@@ -107,7 +108,7 @@
 
 			this.onreadystatechange = function() {
 				callback.apply(this, arguments);
-				if (this.readyState == 4) {
+				if (this && this.readyState == 4) {
 					applyData();
 				}
 			};

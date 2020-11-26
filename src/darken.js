@@ -11,6 +11,7 @@
 // @include      *://*atlassian.net/*
 // @include      *://*developer.mozilla.org/*
 // @include      *://mail.google.com/*
+// @include      *://docs.google.com/*
 // @grant        none
 // ==/UserScript==
 

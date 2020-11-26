@@ -5,7 +5,7 @@
 // @description  Flip the colors of any website
 // @issues       Flips background-images' colors, which isn't cool.
 // @author       https://github.com/yzalium
-// @run-at 		 document-idle
+// @run-at       document-idle
 // @include      *://*wikipedia.org/*
 // @include      *://*/wiki*
 // @include      *://*atlassian.net/*
@@ -23,6 +23,7 @@
     document.head.appendChild(styleElement);
     styleElement.sheet.insertRule('.yzalium-invert { filter: invert(1); }');
 
+    // invert the colors of the whole page
     document.body.style.filter = 'invert(1)';
     getImages(document);
 
@@ -31,7 +32,7 @@
     var observer = new MutationObserver(function(mutations) {
         for (var i = 0; i < mutations.length; ++i) {
             getImages(mutations[i].target);
-        };
+        }
     });
     observer.observe(document.body, { childList: true, subtree: true });
     */

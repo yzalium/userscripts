@@ -135,7 +135,7 @@
   }
 
   function toggleOff(event) {
-    if (!toggle || (event.key != 'Ctrl' && event.key != 'Shift')) {
+    if (!toggle || (event.key != shortCut1 && event.key != shortCut2)) {
       return;
     }
 

@@ -149,6 +149,15 @@
       }
     }
 
+    // remove those pesky overflow-blocking classes from consent popups
+    const match = document.body.outerHTML.match(/"([a-z0-9_-]*popup-open[a-z0-9_-]*)"/i);
+    if (match) {
+      const toClean = document.getElementsByClassName(match[1]);
+      for (let i = 0; i < toClean.length; ++i) {
+        toClean[i].classList.remove(match[1]);
+      }
+    }
+
     // a little delay, to avoid lagging out the page while it's loading up its fuckton of plugins
     setTimeout(function () {
       for (const target in bannedData.actions) {
